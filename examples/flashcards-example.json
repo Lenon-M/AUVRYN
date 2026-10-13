@@ -1,0 +1,17 @@
+[
+  {
+    "front": "Qual é o achado clássico da fibrilação atrial no ECG?",
+    "back": "Ritmo irregularmente irregular e ausência de ondas P organizadas.",
+    "tags": "Arritmias"
+  },
+  {
+    "front": "O que caracteriza um bloqueio AV de 1º grau?",
+    "back": "Intervalo PR prolongado e constante, com condução 1:1.",
+    "tags": "Arritmias"
+  },
+  {
+    "front": "Qual a principal função de um flashcard no AUVRYN?",
+    "back": "Praticar recuperação ativa e programar revisões futuras.",
+    "tags": "Exemplo"
+  }
+]

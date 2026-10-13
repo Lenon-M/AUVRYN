@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f6f3" />
+  <meta name="description" content="AUVRYN — sistema operacional pessoal para estudos, rotina, hábitos e vida." />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com https://www.google.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://*.googleapis.com https://*.google.com https://www.google.com https://www.recaptcha.net https://*.firebaseio.com wss://*.firebaseio.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://firebasestorage.googleapis.com https://www.googleapis.com; frame-src https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://www.recaptcha.net; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <title>AUVRYN 1.11.2 — Life OS</title>
+  <link rel="manifest" href="../../web/manifest.json?v=1.11.2" />
+  <link rel="stylesheet" href="../../web/css/styles.css?v=1.11.2" />
+</head>
+<body class="auth-locked">
+  <section id="authGate" class="auth-gate" aria-live="polite">
+    <div class="auth-visual" aria-hidden="true"><div class="auth-orb auth-orb-a"></div><div class="auth-orb auth-orb-b"></div><div class="auth-landscape"><i></i><b></b><span></span></div></div>
+    <div class="auth-panel">
+      <div class="auth-brand"><span class="brand-mark">A</span><div><b>AUVRYN</b><small>Life OS</small></div></div>
+      <div id="authContent"></div>
+    </div>
+  </section>
+
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-row">
+        <button class="brand" data-route="overview" aria-label="Ir ao panorama"><span class="brand-mark">A</span><span><b>AUVRYN</b><small>Life OS</small></span></button>
+        <button class="icon-btn sidebar-close" id="sidebarClose" aria-label="Fechar menu">×</button>
+      </div>
+
+      <button class="capture-btn" id="globalAdd"><span>✦</span> Assistant <kbd>N</kbd></button>
+
+      <nav class="nav-groups">
+        <div class="nav-group">
+          <span class="nav-label">Visão</span>
+          <button class="nav-item" data-route="overview"><span>⌂</span>Panorama</button>
+          <button class="nav-item" data-route="agenda"><span>▦</span>Agenda</button>
+          <button class="nav-item" data-route="insights"><span>⌁</span>Insights</button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-label">Organização</span>
+          <button class="nav-item" data-route="tasks"><span>✓</span>Tarefas & Projetos</button>
+          <button class="nav-item" data-route="habits"><span>◎</span>Hábitos</button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-label">Áreas</span>
+          <button class="nav-item" data-route="academics"><span>⌁</span>Faculdade</button>
+          <button class="nav-item" data-route="life"><span>◇</span>Vida</button>
+          <button class="nav-item" data-route="library"><span>▤</span>Biblioteca</button>
+          <button class="nav-item" data-route="journal"><span>✎</span>Diário</button>
+        </div>
+      </nav>
+
+      <div class="sidebar-spacer"></div>
+      <button class="nav-item" data-route="settings"><span>⚙</span>Configurações</button>
+      <div class="profile-chip"><span class="avatar" id="avatarLetter">U</span><div><b id="profileName">Meu AUVRYN</b><small>dados locais · offline</small></div></div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div class="top-left">
+          <button class="icon-btn mobile-menu" id="mobileMenu" aria-label="Abrir menu">☰</button>
+          <div><span class="breadcrumb" id="breadcrumb">AUVRYN / Panorama</span><h1 id="pageTitle">Panorama</h1></div>
+        </div>
+        <div class="top-actions">
+          <button class="search-trigger" id="searchTrigger"><span>⌕</span> Buscar <kbd>⌘ K</kbd></button>
+          <button class="icon-btn" id="themeBtn" title="Alternar tema">◐</button>
+          <button class="primary-btn" id="headerAdd">✦ Assistant</button>
+        </div>
+      </header>
+      <main id="app" class="app-content" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <dialog id="editorDialog" class="dialog editor-dialog">
+    <form method="dialog" id="editorForm">
+      <div class="dialog-head"><div><span class="eyebrow" id="editorEyebrow">Editar</span><h2 id="editorTitle">Item</h2></div><button class="icon-btn" value="cancel" aria-label="Fechar">×</button></div>
+      <div class="dialog-body" id="editorFields"></div>
+      <div class="dialog-actions"><button class="danger-btn hidden" type="button" id="editorDelete">Excluir</button><span class="spacer"></span><button class="secondary-btn" value="cancel">Cancelar</button><button class="primary-btn" type="submit">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="searchDialog" class="dialog search-dialog">
+    <div class="search-head"><span>⌕</span><input id="globalSearch" placeholder="Buscar em todo o AUVRYN…" autocomplete="off"/><button class="keycap" id="searchClose">ESC</button></div>
+    <div id="searchResults" class="search-results"></div>
+  </dialog>
+
+  <dialog id="confirmDialog" class="dialog confirm-dialog">
+    <form method="dialog">
+      <div class="dialog-head"><div><span class="eyebrow">Confirmar</span><h2 id="confirmTitle">Excluir item?</h2></div></div>
+      <p id="confirmText">Essa ação não pode ser desfeita.</p>
+      <div class="dialog-actions"><span class="spacer"></span><button class="secondary-btn" value="cancel">Cancelar</button><button class="danger-btn" id="confirmOk" value="default">Excluir</button></div>
+    </form>
+  </dialog>
+
+
+  <dialog id="flashImportDialog" class="dialog editor-dialog">
+    <form method="dialog" id="flashImportForm">
+      <div class="dialog-head"><div><span class="eyebrow">Flashcards</span><h2>Importar do ChatGPT</h2></div><button class="icon-btn" value="cancel" aria-label="Fechar">×</button></div>
+      <div class="dialog-body">
+        <div class="field-row"><div class="field"><label>Nome do baralho</label><input class="input" id="flashDeckTitle" placeholder="Ex.: Arritmias"></div><div class="field"><label>Disciplina / área</label><input class="input" id="flashDeckDiscipline" placeholder="Ex.: Cardiologia"></div></div>
+        <div class="field"><label>Cole os flashcards</label><textarea class="textarea flash-import-area" id="flashImportText" placeholder='JSON, CSV ou uma linha por cartão no formato: Pergunta | Resposta'></textarea></div>
+        <div class="flash-format-hint"><b>Formatos aceitos</b><span>JSON: [{"front":"Pergunta","back":"Resposta"}]</span><span>Texto: Pergunta | Resposta</span><span>CSV: front,back</span></div>
+        <div class="field"><label>Ou escolha um arquivo</label><input class="input" type="file" id="flashImportFile" accept=".json,.csv,.txt,application/json,text/csv,text/plain"></div>
+      </div>
+      <div class="dialog-actions"><button class="secondary-btn" type="button" id="copyFlashPrompt">Copiar prompt para o ChatGPT</button><span class="spacer"></span><button class="secondary-btn" value="cancel">Cancelar</button><button class="primary-btn" type="submit">Importar baralho</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="focusDialog" class="dialog confirm-dialog">
+    <div class="dialog-head"><div><span class="eyebrow">Sessão de foco</span><h2 id="focusTitle">Foco</h2></div><button class="icon-btn" id="focusClose">×</button></div>
+    <div style="padding:28px 20px;text-align:center"><div id="focusClock" style="font:500 56px/1 var(--serif);margin-bottom:10px">25:00</div><p class="muted" id="focusNote">Tempo dedicado também alimenta seus Insights.</p><div style="display:flex;gap:8px;justify-content:center;margin-top:18px"><button class="secondary-btn" id="focusReset">Reiniciar</button><button class="primary-btn" id="focusToggle">Iniciar</button></div></div>
+  </dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <!-- Firebase: login Google + AUVRYN Cloud (Firestore).
+       Se não estiver configurado, o modo local continua funcionando. -->
+  
+  <script type="module" src="../../web/js/ai-provider.js?v=1.11.2"></script>
+  <script src="../../web/js/features-20.js?v=1.11.2"></script>
+  <script src="../../web/js/app.js?v=1.11.2"></script>
+</body>
+</html>

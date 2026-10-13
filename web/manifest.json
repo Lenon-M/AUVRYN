@@ -1,0 +1,22 @@
+{
+  "name": "AUVRYN 1.11.2 — Life OS",
+  "short_name": "AUVRYN",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f7f6f3",
+  "theme_color": "#f7f6f3",
+  "description": "AUVRYN — sistema operacional pessoal para organizar estudos, rotina, hábitos, projetos, saúde, cultura e vida.",
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "version": "1.11.2"
+}

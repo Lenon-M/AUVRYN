@@ -1,0 +1,18 @@
+AUVRYN 1.8 — correção de abertura
+
+1. Extraia TODO o ZIP antes de abrir.
+2. Entre na pasta nexo-os-1.5.
+3. Abra a pasta scripts e clique duas vezes em start-windows.bat.
+4. O launcher encerra automaticamente uma versão antiga do AUVRYN que esteja usando a porta 8765.
+5. O navegador abre em http://localhost:8765/index.html?v=1.8
+
+IMPORTANTE:
+- Não abra o atalho antigo do AUVRYN 1.0 antes de iniciar a 1.5.
+- A porta continua 8765 para preservar os dados locais já existentes nesse endereço.
+- A versão 1.8 força a atualização do HTML, CSS e JavaScript para evitar que o cache da PWA mostre uma release antiga.
+
+Se ainda aparecer a versão antiga:
+- pressione Ctrl+Shift+R uma vez na página;
+- confira em Configurações > Sobre esta versão se aparece AUVRYN 1.8.
+
+NÃO apague os dados do site se você ainda não exportou um backup, pois isso pode apagar dados locais.

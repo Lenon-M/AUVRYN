@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function verified() { return request.auth != null && request.auth.token.email_verified == true; }
+    function signedInAs(userId) { return verified() && request.auth.uid == userId; }
+    function isMember(circleId) { return verified() && exists(/databases/$(database)/documents/circles/$(circleId)/members/$(request.auth.uid)); }
+    function isOwner(circleId) { return verified() && exists(/databases/$(database)/documents/circles/$(circleId)) && get(/databases/$(database)/documents/circles/$(circleId)).data.ownerId == request.auth.uid; }
+    function circleActive(circleId) { return isMember(circleId) && get(/databases/$(database)/documents/circles/$(circleId)).data.archived != true; }
+    function validInvite(circleId, code) {
+      return verified() && code is string
+        && exists(/databases/$(database)/documents/circleInvites/$(code))
+        && get(/databases/$(database)/documents/circleInvites/$(code)).data.circleId == circleId
+        && get(/databases/$(database)/documents/circleInvites/$(code)).data.active == true
+        && get(/databases/$(database)/documents/circleInvites/$(code)).data.type == 'study';
+    }
+
+    match /users/{userId}/circleMemberships/{circleId} {
+      allow read, create, update: if signedInAs(userId);
+      allow delete: if signedInAs(userId) || isOwner(circleId);
+    }
+
+    match /users/{userId}/{document=**} { allow read, write: if signedInAs(userId); }
+
+    match /circleInvites/{code} {
+      allow get: if verified();
+      allow list: if false;
+      allow create: if verified()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.circleId is string
+        && request.resource.data.type == 'study';
+      allow update, delete: if verified() && resource.data.ownerId == request.auth.uid;
+    }
+
+    match /circles/{circleId} {
+      allow create: if verified()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.type == 'study'
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 3
+        && request.resource.data.name.size() <= 80;
+      allow get: if isMember(circleId);
+      allow list: if false;
+      allow update, delete: if isOwner(circleId);
+
+      match /members/{memberId} {
+        allow read: if isMember(circleId);
+        allow create: if verified() && memberId == request.auth.uid
+          && request.resource.data.userId == request.auth.uid
+          && get(/databases/$(database)/documents/circles/$(circleId)).data.archived != true
+          && (isOwner(circleId) || validInvite(circleId, request.resource.data.inviteCode));
+        allow update, delete: if (isMember(circleId) && memberId == request.auth.uid) || isOwner(circleId);
+      }
+
+      match /sessions/{sessionId} {
+        allow read: if isMember(circleId);
+        allow create: if circleActive(circleId)
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.minutes is number
+          && request.resource.data.minutes >= 1
+          && request.resource.data.minutes <= 360;
+        allow update, delete: if (isMember(circleId) && resource.data.userId == request.auth.uid) || isOwner(circleId);
+      }
+
+      match /files/{fileId} {
+        allow read: if isMember(circleId);
+        allow create: if circleActive(circleId)
+          && request.resource.data.uploaderId == request.auth.uid
+          && request.resource.data.kind == 'study_link'
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 120
+          && request.resource.data.url is string
+          && request.resource.data.url.size() > 8
+          && request.resource.data.url.size() <= 2048;
+        allow update, delete: if (isMember(circleId) && resource.data.uploaderId == request.auth.uid) || isOwner(circleId);
+      }
+
+      match /posts/{postId} {
+        allow read: if isMember(circleId);
+        allow create: if circleActive(circleId)
+          && request.resource.data.authorId == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 600;
+        allow update, delete: if (isMember(circleId) && resource.data.authorId == request.auth.uid) || isOwner(circleId);
+      }
+
+      match /challenges/{challengeId} {
+        allow read: if isMember(circleId);
+        allow create: if circleActive(circleId)
+          && request.resource.data.creatorId == request.auth.uid
+          && request.resource.data.type == 'study'
+          && request.resource.data.title is string
+          && request.resource.data.title.size() > 0
+          && request.resource.data.title.size() <= 80;
+        allow update, delete: if (isMember(circleId) && resource.data.creatorId == request.auth.uid) || isOwner(circleId);
+      }
+    }
+  }
+}

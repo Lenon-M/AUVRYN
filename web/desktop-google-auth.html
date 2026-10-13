@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com https://apis.google.com https://accounts.google.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.googleapis.com https://*.google.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com; frame-src https://accounts.google.com https://*.firebaseapp.com; img-src 'self' data: https:; object-src 'none'; base-uri 'self'">
+  <title>Entrar no AUVRYN</title>
+  <style>
+    :root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#24231f;background:#f7f6f3}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}.card{width:min(520px,100%);background:#fffefa;border:1px solid #dedbd2;border-radius:22px;padding:30px;box-shadow:0 20px 70px rgba(30,25,15,.08)}.brand{display:flex;align-items:center;gap:10px;margin-bottom:24px}.mark{width:38px;height:38px;border-radius:12px;background:#25231f;color:#fff;display:grid;place-items:center;font:700 22px Georgia,serif}.brand b{letter-spacing:.08em}.brand small{display:block;color:#77736a}h1{font:500 34px/1.08 Georgia,serif;margin:0 0 10px}p{color:#716d65;line-height:1.55}.btn{width:100%;height:46px;border:0;border-radius:11px;background:#25231f;color:white;font-weight:700;cursor:pointer;margin-top:12px}.status{margin-top:16px;padding:12px 14px;border-radius:12px;background:#f1efe9;color:#67635b;font-size:13px}.ok{background:#e8f2eb;color:#315d43}.err{background:#f7e7e7;color:#8b3f3f}
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="brand"><span class="mark">A</span><div><b>AUVRYN</b><small>Life OS</small></div></div>
+    <h1>Entrar com Google</h1>
+    <p>Este login foi aberto no seu navegador padrão para proteger sua conta. Depois de concluir, volte para o aplicativo AUVRYN.</p>
+    <button class="btn" id="googleBtn">Continuar com Google</button>
+    <div class="status" id="status">Pronto para autenticar.</div>
+  </main>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+  <script src="config/firebase-config.js?v=1.11.2"></script>
+  <script>
+    const statusEl=document.getElementById('status'),btn=document.getElementById('googleBtn');
+    const params=new URLSearchParams(location.search),nonce=params.get('nonce')||'';
+    function status(msg,cls=''){statusEl.textContent=msg;statusEl.className='status '+cls}
+    async function run(){
+      if(!nonce)return status('Sessão de login inválida. Feche esta página e tente novamente.','err');
+      const cfg=window.AUVRYN_FIREBASE_CONFIG||{};if(!cfg.apiKey)return status('Firebase não configurado.','err');
+      try{
+        if(!firebase.apps.length)firebase.initializeApp(cfg);const auth=firebase.auth();auth.languageCode='pt-BR';
+        const provider=new firebase.auth.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+        status('Abrindo o Google…');const result=await auth.signInWithPopup(provider);const cred=firebase.auth.GoogleAuthProvider.credentialFromResult(result);
+        const payload={nonce,idToken:cred?.idToken||'',accessToken:cred?.accessToken||''};
+        if(!payload.idToken&&!payload.accessToken)throw new Error('O Google não retornou uma credencial utilizável.');
+        const res=await fetch('/__auth/callback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!res.ok)throw new Error('O aplicativo não aceitou a resposta de login.');
+        status('Login concluído. Você já pode voltar para o AUVRYN.','ok');btn.disabled=true;btn.textContent='Login concluído';
+        try{await auth.signOut()}catch(e){}
+      }catch(e){console.error(e);status('Não foi possível concluir: '+(e?.message||e),'err')}
+    }
+    btn.addEventListener('click',run);
+    setTimeout(()=>btn.focus(),50);
+  </script>
+</body>
+</html>
